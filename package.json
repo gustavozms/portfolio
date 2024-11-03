@@ -36,6 +36,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"gh-pages": "^6.2.0",
 		"tailwindcss-animate": "^1.0.7"
 	}
 }
