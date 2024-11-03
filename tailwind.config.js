@@ -33,7 +33,7 @@ export default {
 		extend: {
 			colors: {
 				primary: {
-					DEFAULT: '#206CC4',
+					DEFAULT: '#ec1c24',
 					50: '#fff1f2',
 					100: '#ffe0e1',
 					200: '#ffc6c8',
