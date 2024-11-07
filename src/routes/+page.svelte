@@ -1,1 +1,5 @@
-<h1>Initial Page</h1>
+<script lang="ts">
+    import Background from "$lib/components/Background.svelte";
+</script>
+
+<Background />
