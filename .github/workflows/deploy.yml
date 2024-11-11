@@ -31,8 +31,9 @@ jobs:
       - name: Debug
         run: |
           pwd
+          ls -la
           cd portfolio
-          pwd
+          ls -la
   
       - name: build
         env:
