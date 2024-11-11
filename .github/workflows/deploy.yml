@@ -30,6 +30,7 @@ jobs:
 
       - name: Move Code
         run: |
+          mkdir portfolio
           mv _app portfolio/_app
         
       - name: build
