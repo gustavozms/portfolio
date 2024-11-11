@@ -32,8 +32,6 @@ jobs:
         run: |
           pwd
           ls -la
-          cd portfolio
-          ls -la
   
       - name: build
         env:
