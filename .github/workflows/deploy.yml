@@ -28,6 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Debug
+        run: |
+          pwd
+          cd portfolio
+          pwd
+  
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
