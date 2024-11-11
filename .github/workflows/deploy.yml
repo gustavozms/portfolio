@@ -32,6 +32,9 @@ jobs:
         run: |
           pwd
           ls -la
+          cd _app/immutable/entry/
+          ls -la
+          pwd
   
       - name: build
         env:
