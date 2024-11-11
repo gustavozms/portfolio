@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { createBubbler, preventDefault } from 'svelte/legacy';
+
+	const bubble = createBubbler();
 	import { onMount } from 'svelte';
 
-	let canvas: HTMLCanvasElement;
+	let canvas: HTMLCanvasElement = $state();
 	let context: CanvasRenderingContext2D | null;
 	let gridSizeX = 256;
 	let gridSizeY = 256;
@@ -125,7 +128,7 @@
 <div class="canvas-container">
 	<canvas
 		bind:this={canvas}
-		on:contextmenu|preventDefault
+		oncontextmenu={preventDefault(bubble('contextmenu'))}
 	></canvas>
 </div>
 
