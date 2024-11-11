@@ -27,6 +27,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Move Code
+        run: |
+          mv _app portfolio/_app
         
       - name: build
         run: |
