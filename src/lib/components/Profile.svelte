@@ -17,6 +17,7 @@
     </div>
     <a 
         href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+        target="_blank"
         class="fixed bottom-4 right-4 transition-colors"
     >
         Conway's Game of Life
