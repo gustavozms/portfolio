@@ -1,5 +1,3 @@
-<script lang="ts">
-    import Background from "$lib/components/Background.svelte";
-</script>
+<h1>Initial Page</h1>
 
-<Background />
+<meta http-equiv="refresh" content="0; url=./profile" />

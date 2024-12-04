@@ -3,17 +3,29 @@
 
 	let canvas: HTMLCanvasElement;
 	let context: CanvasRenderingContext2D | null;
-	let gridSizeX = 256;
-	let gridSizeY = 256;
-	let cellSize = 4; // px
-	let grid: { state: number, fadeLevel: number }[][] = [];
+	let baseGridSize = 128;
+	let gridSizeX: number;
+	let gridSizeY: number;
+	let cellSize = 8;
+	let grid: { state: number; fadeLevel: number }[][] = [];
 	let isMouseDown = false;
 
+	const calculateGridSize = () => {
+		const aspectRatio = window.innerWidth / window.innerHeight;
+		if (aspectRatio > 1) {
+			gridSizeY = baseGridSize;
+			gridSizeX = Math.floor(baseGridSize * aspectRatio);
+		} else {
+			gridSizeX = baseGridSize;
+			gridSizeY = Math.floor(baseGridSize / aspectRatio);
+		}
+	};
+
 	const initializeGrid = () => {
+		calculateGridSize();
 		grid = Array.from({ length: gridSizeX }, () =>
 			Array.from({ length: gridSizeY }, () => ({
-				// state: 0,
-				state: Math.random() > 0.9 ? 1 : 0,
+				state: Math.random() > 0.5 ? 1 : 0,
 				fadeLevel: 0
 			}))
 		);
@@ -28,12 +40,11 @@
 				const cell = grid[x][y];
 				if (cell.state === 1) {
 					// active
-					context.fillStyle = 'black';
+					context.fillStyle = '#FE2C55';
 					context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 				} else if (cell.fadeLevel > 0) {
 					// transition
-					const shade = Math.floor(255 * cell.fadeLevel);
-					context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+					context.fillStyle = `rgba(254, 44, 85, ${1 - cell.fadeLevel})`;
 					context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 					grid[x][y].fadeLevel = Math.min(cell.fadeLevel + 0.1, 1);
 				} else {
@@ -77,20 +88,6 @@
 		return count;
 	};
 
-	const handleMouseMove = (event: MouseEvent) => {
-		if (isMouseDown) {
-			const rect = canvas.getBoundingClientRect();
-			const x = Math.floor((event.clientX - rect.left) / cellSize);
-			const y = Math.floor((event.clientY - rect.top) / cellSize);
-			if (x >= 0 && x < gridSizeX && y >= 0 && y < gridSizeY) {
-				grid[x][y] = { state: 1, fadeLevel: 0 };
-				grid[x + 1][y + 1] = { state: 1, fadeLevel: 0 };
-				grid[x - 1][y - 1] = { state: 1, fadeLevel: 0 };
-				drawGrid();
-			}
-		}
-	};
-
 	const handleMouseDown = () => {
 		isMouseDown = true;
 	};
@@ -99,49 +96,90 @@
 		isMouseDown = false;
 	};
 
-	onMount(() => {
+	const handleResize = () => {
+		if (!canvas) return;
+		calculateGridSize();
+		canvas.width = gridSizeX * cellSize;
+		canvas.height = gridSizeY * cellSize;
 		initializeGrid();
+		drawGrid();
+	};
+
+	const spawnRandomPattern = () => {
+		const patterns = [
+			// Glider
+			[
+				[0, 0],
+				[1, 0],
+				[2, 0],
+				[2, 1],
+				[1, 2]
+			],
+			// Small explosion
+			[
+				[0, 0],
+				[1, 0],
+				[0, 1],
+				[1, 1],
+				[2, 1],
+				[1, 2]
+			],
+			// Line
+			[
+				[0, 0],
+				[1, 0],
+				[2, 0]
+			],
+			// Square
+			[
+				[0, 0],
+				[0, 1],
+				[1, 0],
+				[1, 1]
+			]
+		];
+		const numPatterns = Math.floor(Math.random() * 3) + 1;
+
+		for (let i = 0; i < numPatterns; i++) {
+			const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+			const x = Math.floor(Math.random() * (gridSizeX - 5));
+			const y = Math.floor(Math.random() * (gridSizeY - 5));
+
+			pattern.forEach(([dx, dy]) => {
+				if (x + dx < gridSizeX && y + dy < gridSizeY) {
+					grid[x + dx][y + dy] = { state: 1, fadeLevel: 0 };
+				}
+			});
+		}
+	};
+
+	onMount(() => {
 		if (canvas) {
 			context = canvas.getContext('2d');
-			canvas.width = gridSizeX * cellSize;
-			canvas.height = gridSizeY * cellSize;
+			handleResize();
 		}
 		drawGrid();
-		const interval = setInterval(updateGrid, 100);
+		const updateInterval = setInterval(updateGrid, 10);
+		const spawnInterval = setInterval(spawnRandomPattern, 2000);
 
+		window.addEventListener('resize', handleResize);
 		canvas.addEventListener('mousedown', handleMouseDown);
+
 		canvas.addEventListener('mouseup', handleMouseUp);
-		canvas.addEventListener('mousemove', handleMouseMove);
 
 		return () => {
-			clearInterval(interval);
+			clearInterval(updateInterval);
+			clearInterval(spawnInterval);
+			window.removeEventListener('resize', handleResize);
 			canvas.removeEventListener('mousedown', handleMouseDown);
 			canvas.removeEventListener('mouseup', handleMouseUp);
-			canvas.removeEventListener('mousemove', handleMouseMove);
 		};
 	});
 </script>
 
-<div class="canvas-container">
-	<canvas
-		bind:this={canvas}
-		on:contextmenu|preventDefault
+<div
+	class="fixed inset-0 flex items-center justify-center w-screen h-screen overflow-hidden bg-white"
+>
+	<canvas class="bg-white overflow-hidden" bind:this={canvas} on:contextmenu|preventDefault
 	></canvas>
 </div>
-
-<style>
-	.canvas-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 100vw;
-		height: 100vh;
-		overflow: hidden;
-		background-color: pink;
-	}
-
-	canvas {
-		background-color: white;
-		overflow: hidden;
-	}
-</style>
