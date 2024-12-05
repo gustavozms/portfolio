@@ -159,7 +159,7 @@
 			handleResize();
 		}
 		drawGrid();
-		const updateInterval = setInterval(updateGrid, 10);
+		const updateInterval = setInterval(updateGrid, 50);
 		const spawnInterval = setInterval(spawnRandomPattern, 2000);
 
 		window.addEventListener('resize', handleResize);
